@@ -4,21 +4,22 @@ class Home extends Controller {
     // Index of the home page (localhost/home(/index))
     // login page
     public function index($param1= '', $param2= '', $param3= '') {
-        echo "<br>Home Controller";
-        // Initialize Test model
-        // $test = $this->model('Test');
+        $productModel = $this->model('ProductModel');
+        $products = $productModel->all();
+        $this->view('home/index', ['products' => $products]);
+    }
 
-        // Call function from the model
-        // $testData = $test->getTestFunction();
+    public function ajaxPaginationProduct() {
+        $productModel = $this->model('ProductModel');
+        $products = $productModel->all();
+        $result = json_encode($products, JSON_UNESCAPED_UNICODE);
+//        $result = str_replace('{', "[", $result);
+//        $result = str_replace('}', "]", $result);
 
-        // $this->view('home/index', ['test' => testData, 'parameters' => [$param1, $param2, $param3]]);
-        $this->view('home/index');
+        echo $result;
     }
 
     public function products($param1='', $param2='', $param3='') {
-        echo "<br>Home products";
         $this->view('home/product');
     }
 }
-
-?>

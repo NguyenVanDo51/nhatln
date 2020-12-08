@@ -1,7 +1,6 @@
 <?php
 class User extends Controller {
 
-    // Index of the home page (localhost/home(/index))
     // login page
     public function index($param1= '', $param2= '', $param3= '') {
         $user = isset($_POST['user']) ? $_POST['user'] : '';
