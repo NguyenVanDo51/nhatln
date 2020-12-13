@@ -34,7 +34,7 @@
         .product-input {
             padding: 0 1rem;
             border: 1px solid;
-            max-width: 5rem;
+            max-width: 6rem;
         }
     </style>
     <!-- Main CSS-->
@@ -49,10 +49,10 @@
             <div class="container-fluid">
                 <div class="header-mobile-inner">
                     <a class="logo" href="<?= URL ?>">
-                        <img src="images/logo.jpg" alt="Tue minh"/>
+                        <img src="images/logo.jpg" alt="Tue minh" style="max-height: 36px;" />
                     </a>
                     <button class="hamburger hamburger--slider" type="button">
-                            <span class="hamburger-box">
+                            <span class="hamburger-box" style="height: 20px;">
                                 <span class="hamburger-inner"></span>
                             </span>
                     </button>
@@ -104,7 +104,10 @@
                     <div class="row">
                         <div class="col-md-12">
                             <h3 class="title-5 m-b-35">Sản phẩm đã chọn</h3>
-                            <div class="task-progress" id="products-choose" data-index="0">(Trống)</div>
+                            <div class="task-progress">
+                                <div id="products-choose" data-index="0" class="mb-3">(Trống)</div>
+                                <h4 class="text-info">Tổng: <span id="products-sum"></span></h4>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
@@ -251,26 +254,26 @@
         }
 
         var inCart = [];
+        localStorage.setItem('sum', '0');
         $('.btn-choose-product').click(function() {
-            console.log(this);
             var name = this.getAttribute('data-name');
             var productId = this.getAttribute('data-id');
             var price = this.getAttribute('data-price');
+            var sum = Number(localStorage.getItem('sum'));
+            var sum = sum + Number(price);
+            localStorage.setItem('sum', sum);
             var price_format = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
-            console.log(price_format);
-            console.log(productId);
             if (inCart.indexOf(productId) !== -1) return;
             inCart.push(productId);
-            console.log(inCart);
             var productChoose = $("#products-choose");
             if(productChoose.attr('data-index') == 0) {
-                productChoose.html(`<div class="my-3">
+                productChoose.html(`<div class="mb-3">
                     <h5 class="mt-1" id="product-${productId}" data-price="${price}">${name}</h5>
                     <span style="min-width: 14rem;display: inline-block;">Tiền sản phẩm: ${price_format}</span>
                     <span class="mx-2"> X </span>
                     <input class="product-input" type="number" min="1" value="1" data-id="${productId}" data-price="${price}" name="value-product-${productId}" />
                     <span>=<span>
-                    <span id="product-${productId}-sum">${price_format}</span>
+                    <span class="product-class-sum" id="product-${productId}-sum" data-sum=${price}>${price_format}</span>
                 <div>`)
             } else {
                 productChoose.append(`<div class="my-3">
@@ -279,16 +282,29 @@
                     <span class="mx-2"> X </span>
                     <input class="product-input" type="number" min="1" value="1" data-id="${productId}" data-price="${price}" name="value-product-${productId}" />
                     <span>=<span>
-                    <span id="product-${productId}-sum">${price_format}</span>
+                    <span class="product-class-sum" id="product-${productId}-sum" data-sum=${price}>${price_format}</span>
                 <div>`)
             }
+            $('#products-sum').text(new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(sum));
+
             productChoose.attr('data-index', productChoose.attr('data-index') + 1);
+
             $('.product-input').change(function() {
                 var p_id = this.getAttribute('data-id');
-                var p_price = this.getAttribute('data-price')
+                var p_price = this.getAttribute('data-price');
+
                 var p_price_format = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p_price * this.value);
-                console.log(`#product-${p_id}-sum`);
+                $(`#product-${p_id}-sum`).attr('data-sum', String(p_price * this.value));
                 $(`#product-${p_id}-sum`).text(p_price_format);
+
+                var sumElements = $('.product-class-sum');
+                var p_sum = Number(0);
+                sumElements.each(function(index, value) {
+                    p_sum = p_sum + Number(value.getAttribute('data-sum'));
+                    console.log(Number(value.getAttribute('data-sum')));
+                })
+                localStorage.setItem('sum', p_sum);
+                $('#products-sum').text(new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p_sum));
             });
         })
 
